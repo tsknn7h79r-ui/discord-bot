@@ -29,6 +29,7 @@ ADMIN_COMMANDS = [
     ("`/settitleall`", "Set titles for all members based on their roles"),
     ("`/settitle @user`", "Set the title for a specific member"),
     ("`/removetitle @user`", "Remove the title from a specific member"),
+    ("`/autoemoji on/off`", "Toggle AI auto-emoji for roles with no keyword match"),
     ("`/titlekeywords`", "View current keyword → emoji mappings"),
     ("`/addkeyword <keyword> <emoji>`", "Add a custom role keyword mapping"),
     ("`/removekeyword <keyword>`", "Remove a keyword mapping"),
