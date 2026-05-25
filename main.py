@@ -32,9 +32,6 @@ class DiscordBot(commands.Bot):
     async def on_ready(self):
         print(f"Logged in as {self.user} (ID: {self.user.id})")
 
-        await self.tree.sync()
-        print("Global sync complete.")
-
         for guild in self.guilds:
             try:
                 self.tree.copy_global_to(guild=guild)
