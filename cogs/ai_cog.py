@@ -119,12 +119,12 @@ class AICog(commands.Cog, name="AI"):
         self._groq_client = None
 
         embed = discord.Embed(
-            title="✅ Personality Updated",
-            description=f"The bot's personality has been set to:\n> {personality}",
+            title="🧠 Personality Updated",
+            description=f"The bot's personality has been changed to:\n> {personality}",
             color=discord.Color.green()
         )
-        embed.set_footer(text="The new personality will apply to all future AI interactions.")
-        await interaction.response.send_message(embed=embed, ephemeral=True)
+        embed.set_footer(text=f"Changed by {interaction.user.display_name}")
+        await interaction.response.send_message(embed=embed)
 
     @app_commands.command(name="personality", description="View the bot's current AI personality.")
     async def personality(self, interaction: discord.Interaction):
