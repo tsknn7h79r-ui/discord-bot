@@ -61,7 +61,7 @@ class AICog(commands.Cog, name="AI"):
         system_msg = system or (get_personality(guild_id) if guild_id else DEFAULT_PERSONALITY)
 
         response = await client.chat.completions.create(
-            model="llama3-8b-8192",
+            model="llama-3.1-8b-instant",
             messages=[
                 {"role": "system", "content": system_msg},
                 {"role": "user", "content": prompt},

@@ -188,31 +188,30 @@ class FunCog(commands.Cog, name="Fun"):
     @app_commands.command(name="rate", description="Get a consistent rating for anything!")
     @app_commands.describe(prompt="What do you want to rate?")
     async def rate(self, interaction: discord.Interaction, prompt: str):
+        await interaction.response.defer()
+
         rating = consistent_number(prompt, 1, 100)
-
-        if rating >= 90:
-            comment = "Absolutely legendary. 🏆"
-        elif rating >= 75:
-            comment = "Genuinely impressive. 👏"
-        elif rating >= 60:
-            comment = "Pretty solid, not bad at all."
-        elif rating >= 45:
-            comment = "Decent. Could be worse."
-        elif rating >= 30:
-            comment = "Ehh... it's a little mid."
-        elif rating >= 15:
-            comment = "Not great, not terrible. 😬"
-        else:
-            comment = "Yikes. That's rough. 💀"
-
         bar_filled = round(rating / 10)
         bar = "█" * bar_filled + "░" * (10 - bar_filled)
 
+        ai_cog = self.bot.get_cog("AI")
+        description = ""
+        if ai_cog:
+            try:
+                guild_id = interaction.guild.id if interaction.guild else None
+                description = await ai_cog.quick_ai(
+                    f"Write a single short, witty, and unique sentence rating '{prompt}' a {rating}/100. "
+                    f"Be creative and match the tone to the score — harsh if low, glowing if high.",
+                    guild_id=guild_id
+                )
+            except Exception:
+                pass
+
         embed = discord.Embed(title=f"⭐ Rating: {prompt}", color=discord.Color.orange())
         embed.add_field(name="Score", value=f"`{bar}` **{rating}/100**", inline=False)
-        embed.add_field(name="Verdict", value=comment, inline=False)
-        embed.set_footer(text="This rating is consistent — it never changes for this prompt.")
-        await interaction.response.send_message(embed=embed)
+        if description:
+            embed.add_field(name="Verdict", value=description, inline=False)
+        await interaction.followup.send(embed=embed)
 
     @app_commands.command(name="compare", description="Compare two things and see who wins!")
     @app_commands.describe(thing1="First thing", thing2="Second thing")
