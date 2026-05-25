@@ -57,20 +57,43 @@ class UtilityCog(commands.Cog, name="Utility"):
     def __init__(self, bot):
         self.bot = bot
 
-    @app_commands.command(name="invite", description="Get the link to add this bot to your server!")
+    @app_commands.command(name="invite", description="Get the links to add this bot to a server or your apps.")
     async def invite(self, interaction: discord.Interaction):
-        url = (
+        server_url = (
             f"https://discord.com/oauth2/authorize"
             f"?client_id={CLIENT_ID}"
             f"&permissions={PERMISSIONS}"
             f"&scope=bot%20applications.commands"
         )
+        user_app_url = (
+            f"https://discord.com/oauth2/authorize"
+            f"?client_id={CLIENT_ID}"
+            f"&scope=applications.commands"
+            f"&integration_type=1"
+        )
+
         embed = discord.Embed(
-            title="➕ Add Me to Your Server!",
-            description=f"[**Click here to invite the bot**]({url})\n\nMake sure to grant all requested permissions so the title system and AI features work properly.",
+            title="➕ Add This Bot",
             color=discord.Color.blurple()
         )
-        embed.set_footer(text="Thanks for using the bot!")
+        embed.add_field(
+            name="🖥️ Add to a Server",
+            value=f"[**Click here**]({server_url})\nAdds the bot to a server you manage.",
+            inline=False
+        )
+        embed.add_field(
+            name="👤 Add to My Apps",
+            value=(
+                f"[**Click here**]({user_app_url})\n"
+                f"Lets you use the bot anywhere in Discord.\n\n"
+                f"⚠️ **One-time setup required first:**\n"
+                f"1. Go to [Discord Developer Portal](https://discord.com/developers/applications/{CLIENT_ID}/installation)\n"
+                f"2. Under **Installation** → tick **User Install**\n"
+                f"3. Save, then use the link above"
+            ),
+            inline=False
+        )
+        embed.set_footer(text="User Install lets you use slash commands in any server or DM.")
         await interaction.response.send_message(embed=embed)
 
     @app_commands.command(name="poll", description="Create a poll with up to 4 options.")
