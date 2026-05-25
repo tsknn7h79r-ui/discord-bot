@@ -35,24 +35,22 @@ class DiscordBot(commands.Bot):
     async def on_ready(self):
         print(f"Logged in as {self.user} (ID: {self.user.id})")
 
-        # Wipe stale global commands from Discord (the source of duplicates)
-        saved = self.tree.get_commands()
-        self.tree.clear_commands(guild=None)
-        await self.tree.sync()
-        print("Cleared global commands.")
+        # Directly wipe ALL global commands via Discord's REST API
+        # This is the only reliable way to remove stale global commands
+        try:
+            await self.http.bulk_upsert_global_commands(self.application_id, [])
+            print("Wiped all global commands from Discord API.")
+        except Exception as e:
+            print(f"Warning: could not wipe global commands: {e}")
 
-        # Restore commands to tree
-        for cmd in saved:
-            self.tree.add_command(cmd)
-
-        # Sync to each guild instantly (guild commands appear immediately)
+        # Sync guild-specific commands (appear instantly, no global duplicates)
         for guild in self.guilds:
             try:
                 self.tree.copy_global_to(guild=guild)
                 await self.tree.sync(guild=guild)
                 print(f"Synced to: {guild.name}")
             except Exception as e:
-                print(f"Failed to sync to guild {guild.id}: {e}")
+                print(f"Failed to sync to {guild.name}: {e}")
 
         activity = discord.Activity(
             type=discord.ActivityType.playing,
@@ -64,8 +62,9 @@ class DiscordBot(commands.Bot):
         try:
             self.tree.copy_global_to(guild=guild)
             await self.tree.sync(guild=guild)
-        except Exception:
-            pass
+            print(f"New guild synced: {guild.name}")
+        except Exception as e:
+            print(f"Failed to sync new guild {guild.name}: {e}")
 
 
 bot = DiscordBot()

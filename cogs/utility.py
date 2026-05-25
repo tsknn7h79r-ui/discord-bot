@@ -86,10 +86,11 @@ class UtilityCog(commands.Cog, name="Utility"):
             value=(
                 f"[**Click here**]({user_app_url})\n"
                 f"Lets you use the bot anywhere in Discord.\n\n"
-                f"⚠️ **One-time setup required first:**\n"
-                f"1. Go to [Discord Developer Portal](https://discord.com/developers/applications/{CLIENT_ID}/installation)\n"
-                f"2. Under **Installation** → tick **User Install**\n"
-                f"3. Save, then use the link above"
+                f"⚠️ **Setup checklist (Developer Portal):**\n"
+                f"1. Open [Installation settings](https://discord.com/developers/applications/{CLIENT_ID}/installation)\n"
+                f"2. **Installation Contexts** → tick ✅ **User Install**\n"
+                f"3. **Default Install Settings → User Install** → add scope: `applications.commands`\n"
+                f"4. Hit **Save Changes**, then use the link above"
             ),
             inline=False
         )
