@@ -138,8 +138,10 @@ def clean_old_conversations():
 
 
 def get_conversation_history(key: str) -> list:
-    """Get conversation history for a key"""
-    return conversation_memory.get(key, [])
+    """Get conversation history for a key (cleaned for API)"""
+    history = conversation_memory.get(key, [])
+    # Strip timestamps before returning - APIs don't support them
+    return [{"role": msg["role"], "content": msg["content"]} for msg in history]
 
 
 def clear_conversation(key: str):
