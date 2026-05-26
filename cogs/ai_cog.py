@@ -25,15 +25,19 @@ def load_personalities() -> dict:
         try:
             with open(DATA_FILE, "r") as f:
                 return json.load(f)
-        except Exception:
+        except Exception as e:
+            print(f"Error loading personalities: {e}")
             return {}
     return {}
 
 
 def save_personalities(data: dict):
     os.makedirs("data", exist_ok=True)
-    with open(DATA_FILE, "w") as f:
-        json.dump(data, f, indent=2)
+    try:
+        with open(DATA_FILE, "w") as f:
+            json.dump(data, f, indent=2)
+    except Exception as e:
+        print(f"Error saving personalities: {e}")
 
 
 def get_personality(guild_id: int) -> str:
@@ -52,29 +56,42 @@ def load_channels() -> dict:
     if os.path.exists(CHANNEL_FILE):
         try:
             with open(CHANNEL_FILE, "r") as f:
-                return json.load(f)
-        except Exception:
+                data = json.load(f)
+                return data if isinstance(data, dict) else {}
+        except Exception as e:
+            print(f"Error loading channels: {e}")
             return {}
     return {}
 
 
 def save_channels(data: dict):
     os.makedirs("data", exist_ok=True)
-    with open(CHANNEL_FILE, "w") as f:
-        json.dump(data, f, indent=2)
+    try:
+        with open(CHANNEL_FILE, "w") as f:
+            json.dump(data, f, indent=2)
+    except Exception as e:
+        print(f"Error saving channels: {e}")
 
 
 def get_active_channel(guild_id: int):
-    return load_channels().get(str(guild_id))
+    try:
+        channels = load_channels()
+        return channels.get(str(guild_id))
+    except Exception as e:
+        print(f"Error getting active channel: {e}")
+        return None
 
 
 def set_active_channel(guild_id: int, channel_id: int | None):
-    data = load_channels()
-    if channel_id is None:
-        data.pop(str(guild_id), None)
-    else:
-        data[str(guild_id)] = channel_id
-    save_channels(data)
+    try:
+        data = load_channels()
+        if channel_id is None:
+            data.pop(str(guild_id), None)
+        else:
+            data[str(guild_id)] = channel_id
+        save_channels(data)
+    except Exception as e:
+        print(f"Error setting active channel: {e}")
 
 
 def get_conversation_key(context: discord.Interaction | discord.Message) -> str:
@@ -148,7 +165,8 @@ class AICog(commands.Cog, name="AI"):
             from groq import AsyncGroq
             self._groq_client = AsyncGroq(api_key=api_key)
             return self._groq_client
-        except Exception:
+        except Exception as e:
+            print(f"Error initializing Groq client: {e}")
             return None
 
     async def quick_ai(self, prompt: str, guild_id: int = None, system: str = None, conversation_key: str = None) -> str:
@@ -201,6 +219,7 @@ class AICog(commands.Cog, name="AI"):
                     reply = reply[:1997] + "..."
                 await message.reply(reply)
             except Exception as e:
+                print(f"Error in _send_ai_reply: {e}")
                 await message.reply(f"⚠️ Something went wrong with the AI: {e}")
 
     @commands.Cog.listener()
@@ -275,8 +294,6 @@ class AICog(commands.Cog, name="AI"):
         data = load_personalities()
         data[str(interaction.guild.id)] = personality
         save_personalities(data)
-
-        self._groq_client = None
 
         embed = discord.Embed(
             title="🧠 Personality Updated",
