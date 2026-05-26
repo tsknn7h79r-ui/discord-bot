@@ -214,8 +214,8 @@ class FunCog(commands.Cog, name="Fun"):
                     f"Match the tone to the score — brutal if 1-3, lukewarm if 4-6, glowing if 7-10.",
                     guild_id=guild_id
                 )
-            except Exception:
-                pass
+            except Exception as e:
+                print(f"Error in rate command: {e}")
 
         embed = discord.Embed(title=f"{star} Rating: {prompt}", color=color)
         embed.add_field(name="Score", value=f"`{bar}` **{rating} / 10**", inline=False)
@@ -250,7 +250,8 @@ class FunCog(commands.Cog, name="Fun"):
                 verdict = await ai_cog.quick_ai(
                     f"In one short, witty, funny sentence: explain why {winner} beats {loser}. Be creative and humorous."
                 )
-            except Exception:
+            except Exception as e:
+                print(f"Error in compare command: {e}")
                 verdict = f"{winner} simply outclasses {loser} in every way imaginable."
         else:
             verdict = f"{winner} simply outclasses {loser} in every way imaginable."
@@ -340,6 +341,7 @@ class FunCog(commands.Cog, name="Fun"):
                 f"Keep it funny and lighthearted, not mean-spirited. One or two sentences max."
             )
         except Exception as e:
+            print(f"Error in roast command: {e}")
             await interaction.followup.send(f"Couldn't roast them this time: {e}")
             return
 
@@ -366,6 +368,7 @@ class FunCog(commands.Cog, name="Fun"):
                 "Format it as: 'Would you rather [option A] or [option B]?' — just the question, nothing else."
             )
         except Exception as e:
+            print(f"Error in wyr command: {e}")
             await interaction.followup.send(f"Couldn't generate a question: {e}")
             return
 
@@ -431,6 +434,7 @@ class FunCog(commands.Cog, name="Fun"):
             question = next((l.replace("QUESTION:", "").strip() for l in lines if l.startswith("QUESTION:")), "Unknown question")
             answer = next((l.replace("ANSWER:", "").strip() for l in lines if l.startswith("ANSWER:")), "Unknown answer")
         except Exception as e:
+            print(f"Error in trivia command: {e}")
             await interaction.followup.send(f"Couldn't fetch a trivia question: {e}")
             return
 
@@ -441,7 +445,7 @@ class FunCog(commands.Cog, name="Fun"):
 
         await asyncio.sleep(15)
 
-        embed.add_field(name="Answer", value=f"||{answer}||", inline=False)
+        embed.add_field(name="Answer", value=f"||}:{answer}:||", inline=False)
         embed.set_footer(text="Times up! How did you do?")
         await msg.edit(embed=embed)
 
@@ -460,6 +464,7 @@ class FunCog(commands.Cog, name="Fun"):
                 "Keep it to 1-2 sentences. Don't say 'Did you know' — just state the fact."
             )
         except Exception as e:
+            print(f"Error in fact command: {e}")
             await interaction.followup.send(f"Couldn't fetch a fact: {e}")
             return
 

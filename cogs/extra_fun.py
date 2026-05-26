@@ -81,6 +81,7 @@ class ExtraFunCog(commands.Cog, name="ExtraFun"):
                 await interaction.followup.send("Couldn't parse the riddle. Try again!")
                 return
         except Exception as e:
+            print(f"Error in riddle command: {e}")
             await interaction.followup.send(f"Couldn't generate a riddle: {e}")
             return
 
@@ -109,6 +110,7 @@ class ExtraFunCog(commands.Cog, name="ExtraFun"):
                 system="You are a wise and empathetic advisor. Give real, grounded advice."
             )
         except Exception as e:
+            print(f"Error in advice command: {e}")
             await interaction.followup.send(f"Couldn't generate advice: {e}")
             return
 
@@ -164,6 +166,7 @@ class ExtraFunCog(commands.Cog, name="ExtraFun"):
                 system="You are a conversation facilitator. Reply with a single creative topic or question."
             )
         except Exception as e:
+            print(f"Error in topic command: {e}")
             await interaction.followup.send(f"Couldn't get a topic: {e}")
             return
 
@@ -206,6 +209,7 @@ class ExtraFunCog(commands.Cog, name="ExtraFun"):
                 system="You are a dramatic mystical astrologer. Be theatrical and fun."
             )
         except Exception as e:
+            print(f"Error in horoscope command: {e}")
             await interaction.followup.send(f"The stars aren't speaking today: {e}")
             return
 
@@ -234,6 +238,7 @@ class ExtraFunCog(commands.Cog, name="ExtraFun"):
                 system="You are a skilled debater who always argues the opposite side of any statement."
             )
         except Exception as e:
+            print(f"Error in debate command: {e}")
             await interaction.followup.send(f"Couldn't start the debate: {e}")
             return
 
