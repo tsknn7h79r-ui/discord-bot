@@ -182,7 +182,7 @@ class AICog(commands.Cog, name="AI"):
         # Build message list with conversation history
         messages = [{"role": "system", "content": system_msg}]
         
-        # Add conversation history if available
+        # Add conversation history if available - ALWAYS clean timestamps
         if conversation_key:
             history = get_conversation_history(conversation_key)
             messages.extend(history)
@@ -190,12 +190,17 @@ class AICog(commands.Cog, name="AI"):
         # Add the current prompt
         messages.append({"role": "user", "content": prompt})
 
-        response = await client.chat.completions.create(
-            model="llama-3.1-8b-instant",
-            messages=messages,
-            max_tokens=512,
-        )
-        return response.choices[0].message.content.strip()
+        try:
+            response = await client.chat.completions.create(
+                model="llama-3.1-8b-instant",
+                messages=messages,
+                max_tokens=512,
+            )
+            return response.choices[0].message.content.strip()
+        except Exception as e:
+            print(f"Groq API Error: {e}")
+            print(f"Messages sent: {messages}")
+            raise
 
     async def _send_ai_reply(self, message: discord.Message, content: str):
         client = self.get_groq_client()
@@ -328,11 +333,9 @@ class AICog(commands.Cog, name="AI"):
             return
 
         try:
-            conversation_key = get_conversation_key(interaction)
             story_text = await self.quick_ai(
                 f"Write a creative, engaging short story (around 150-250 words) about: {prompt}",
-                system="You are a creative storyteller who writes captivating, imaginative short stories.",
-                conversation_key=conversation_key
+                system="You are a creative storyteller who writes captivating, imaginative short stories."
             )
         except Exception as e:
             await interaction.followup.send(f"⚠️ Couldn't generate a story: {e}")
