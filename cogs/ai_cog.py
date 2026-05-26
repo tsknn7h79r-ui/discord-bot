@@ -141,7 +141,13 @@ def get_conversation_history(key: str) -> list:
     """Get conversation history for a key (cleaned for API)"""
     history = conversation_memory.get(key, [])
     # Strip timestamps before returning - APIs don't support them
-    return [{"role": msg["role"], "content": msg["content"]} for msg in history]
+    cleaned = []
+    for msg in history:
+        cleaned.append({
+            "role": msg.get("role", "user"),
+            "content": msg.get("content", "")
+        })
+    return cleaned
 
 
 def clear_conversation(key: str):
@@ -179,16 +185,29 @@ class AICog(commands.Cog, name="AI"):
 
         system_msg = system or (get_personality(guild_id) if guild_id else DEFAULT_PERSONALITY)
         
-        # Build message list with conversation history
-        messages = [{"role": "system", "content": system_msg}]
+        # Build message list - FRESH LIST EACH TIME
+        messages = []
         
-        # Add conversation history if available - ALWAYS clean timestamps
+        # Add system message with only role and content
+        messages.append({
+            "role": "system",
+            "content": system_msg
+        })
+        
+        # Add conversation history if available - ONLY role and content
         if conversation_key:
             history = get_conversation_history(conversation_key)
-            messages.extend(history)
+            for msg in history:
+                messages.append({
+                    "role": msg["role"],
+                    "content": msg["content"]
+                })
         
-        # Add the current prompt
-        messages.append({"role": "user", "content": prompt})
+        # Add the current prompt - ONLY role and content
+        messages.append({
+            "role": "user",
+            "content": prompt
+        })
 
         try:
             response = await client.chat.completions.create(
@@ -199,7 +218,6 @@ class AICog(commands.Cog, name="AI"):
             return response.choices[0].message.content.strip()
         except Exception as e:
             print(f"Groq API Error: {e}")
-            print(f"Messages sent: {messages}")
             raise
 
     async def _send_ai_reply(self, message: discord.Message, content: str):
